@@ -6,12 +6,12 @@
 #include <string>
 #include <unordered_map>
 
-struct Node {
+struct HNode {
   char data;
   size_t freq;
 
-  Node* left;
-  Node* right;
+  HNode* left;
+  HNode* right;
 };
 
 class HaffmanCoder {
@@ -19,18 +19,15 @@ class HaffmanCoder {
   HaffmanCoder() noexcept : h_tree_root_(nullptr) {}
   ~HaffmanCoder() noexcept;
 
-  void analyse_text(const std::string& in_filename) noexcept;
-
-  void fill_codebase(const Node* cur_node,
-                     std::vector<bool>& cur_code) noexcept;
-
-  void create_code();
-
-  void write_to_file(const std::string& in_filename,
-                     const std::string& out_filename);
+  void AnalyseText(const std::string& in_filename) noexcept;
+  void CreateCode();
+  void WriteToFile(const std::string& in_filename,
+                   const std::string& out_filename);
 
  private:
-  Node* h_tree_root_;
+  void FillCodebase(const HNode* cur_node, std::vector<bool>& cur_code) noexcept;
+
+  HNode* h_tree_root_;
 
   std::unordered_map<char, size_t> char_freqs_;
   std::unordered_map<char, std::vector<bool>> codebase_;

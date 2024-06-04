@@ -10,7 +10,11 @@
 #include <vector>
 
 HaffmanCoder::~HaffmanCoder() noexcept {
-  std::queue<Node*> grbg_collector({h_tree_root_});
+  if (!h_tree_root_) {
+    return;
+  }
+
+  std::queue<HNode*> grbg_collector({h_tree_root_});
   while (!grbg_collector.empty()) {
     if (grbg_collector.front()->left) {
       grbg_collector.push(grbg_collector.front()->left);
@@ -25,7 +29,7 @@ HaffmanCoder::~HaffmanCoder() noexcept {
   }
 }
 
-void HaffmanCoder::analyse_text(const std::string& in_filename) noexcept {
+void HaffmanCoder::AnalyseText(const std::string& in_filename) noexcept {
   std::ifstream in_file(in_filename, std::ios_base::in);
   char buf[1024];
   while (true) {
@@ -40,17 +44,17 @@ void HaffmanCoder::analyse_text(const std::string& in_filename) noexcept {
   }
 }
 
-void HaffmanCoder::fill_codebase(const Node* cur_node,
+void HaffmanCoder::FillCodebase(const HNode* cur_node,
                                  std::vector<bool>& cur_code) noexcept {
   if (cur_node->left) {
     cur_code.emplace_back(0);
-    fill_codebase(cur_node->left, cur_code);
+    FillCodebase(cur_node->left, cur_code);
     cur_code.pop_back();
   }
 
   if (cur_node->right) {
     cur_code.emplace_back(1);
-    fill_codebase(cur_node->right, cur_code);
+    FillCodebase(cur_node->right, cur_code);
     cur_code.pop_back();
   }
 
@@ -64,13 +68,13 @@ void HaffmanCoder::fill_codebase(const Node* cur_node,
   }
 }
 
-void HaffmanCoder::create_code() {
+void HaffmanCoder::CreateCode() {
   auto cmp = [](const auto a, const auto b) { return a->freq > b->freq; };
-  std::priority_queue<Node*, std::deque<Node*>, decltype(cmp)> ordered_queue(
+  std::priority_queue<HNode*, std::deque<HNode*>, decltype(cmp)> ordered_queue(
       cmp);
 
   for (auto elem : char_freqs_) {
-    ordered_queue.push(new Node({elem.first, elem.second, nullptr, nullptr}));
+    ordered_queue.push(new HNode({elem.first, elem.second, nullptr, nullptr}));
   }
 
   while (ordered_queue.size() > 1) {
@@ -79,7 +83,7 @@ void HaffmanCoder::create_code() {
     auto node_left = ordered_queue.top();
     ordered_queue.pop();
 
-    auto new_node = new Node(
+    auto new_node = new HNode(
         {NULL, node_left->freq + node_right->freq, node_left, node_right});
     ordered_queue.push(new_node);
   }
@@ -87,10 +91,12 @@ void HaffmanCoder::create_code() {
   h_tree_root_ = ordered_queue.top();
   std::vector<bool> code_value;
 
-  fill_codebase(h_tree_root_, code_value);
+  std::cout << "Haffman code:" << std::endl;
+  FillCodebase(h_tree_root_, code_value);
+  std::cout << std::endl;
 }
 
-void HaffmanCoder::write_to_file(const std::string& in_filename,
+void HaffmanCoder::WriteToFile(const std::string& in_filename,
                                  const std::string& out_filename) {
   std::ifstream in_file(in_filename, std::ios_base::in);
   std::ofstream out_file(out_filename + "_haffman.txt",

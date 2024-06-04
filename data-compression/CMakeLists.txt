@@ -6,6 +6,7 @@ project(coding-theory LANGUAGES CXX)
 
 add_library(${PROJECT_NAME} STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/sources/haffman.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/sources/shannon_fano.cpp
 )
 
 add_executable(demo main.cpp)
